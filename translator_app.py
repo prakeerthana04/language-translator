@@ -3,16 +3,31 @@ from deep_translator import GoogleTranslator
 from gtts import gTTS
 import tempfile
 
+# Mapping of languages to gTTS-supported language codes
+gtts_lang_codes = {
+    "english": "en",
+    "hindi": "hi",
+    "malayalam": "ml",
+    "tamil": "ta",
+    "kannada": "kn",
+    "telugu": "te",
+    "french": "fr",
+    "german": "de",
+    "spanish": "es",
+    "italian": "it",
+    "japanese": "ja",
+    "chinese (simplified)": "zh-cn"
+    # Add more as needed
+}
+
 st.set_page_config(page_title="Universal Translator 🌍", layout="centered")
 st.title("🌐 Language Translator with Voice")
 
 text_input = st.text_area("Enter text to translate:", height=100)
 
-# ✅ Corrected line to avoid TypeError
 lang_list = GoogleTranslator().get_supported_languages()
-
 source_lang = st.selectbox("Source language", lang_list, index=lang_list.index("english"))
-target_lang = st.selectbox("Target language", lang_list, index=lang_list.index("hindi"))
+target_lang = st.selectbox("Target language", lang_list, index=lang_list.index("malayalam"))
 
 if st.button("Translate"):
     try:
@@ -20,13 +35,16 @@ if st.button("Translate"):
         st.success(f"Translation ({target_lang.title()}):")
         st.write(translated)
 
-        # ✅ Get language code for gTTS
-        tts = gTTS(translated, lang=GoogleTranslator().get_language_code(target_lang))
+        # Use language code only if supported in gTTS
+        lang_code = gtts_lang_codes.get(target_lang.lower())
+        if lang_code:
+            tts = gTTS(translated, lang=lang_code)
 
-        # ✅ Play audio
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
-            tts.save(tmp.name)
-            st.audio(tmp.name, format="audio/mp3")
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
+                tts.save(tmp.name)
+                st.audio(tmp.name, format="audio/mp3")
+        else:
+            st.warning(f"Voice playback not available for '{target_lang.title()}'.")
 
     except Exception as e:
         st.error(f"Translation failed: {e}")
