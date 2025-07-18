@@ -8,10 +8,9 @@ st.title("🌐 Language Translator with Voice")
 
 text_input = st.text_area("Enter text to translate:", height=100)
 
-# ✅ FIXED: Removed as_dict=True
-lang_list = GoogleTranslator.get_supported_languages()
+# ✅ Corrected line to avoid TypeError
+lang_list = GoogleTranslator().get_supported_languages()
 
-# ✅ Set default selections safely
 source_lang = st.selectbox("Source language", lang_list, index=lang_list.index("english"))
 target_lang = st.selectbox("Target language", lang_list, index=lang_list.index("hindi"))
 
@@ -21,12 +20,13 @@ if st.button("Translate"):
         st.success(f"Translation ({target_lang.title()}):")
         st.write(translated)
 
-        # ✅ gTTS uses language codes; convert language name to code
+        # ✅ Get language code for gTTS
         tts = gTTS(translated, lang=GoogleTranslator().get_language_code(target_lang))
 
-        # ✅ Save and play audio
+        # ✅ Play audio
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
             tts.save(tmp.name)
             st.audio(tmp.name, format="audio/mp3")
+
     except Exception as e:
-        st.error("Translation failed. Please try again.")
+        st.error(f"Translation failed: {e}")
