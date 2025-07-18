@@ -21,7 +21,7 @@ gtts_lang_codes = {
 }
 
 st.set_page_config(page_title="Universal Translator 🌍", layout="centered")
-st.title("🌐 Language Translator with Voice")
+st.title("🌐 Universal Language Translator ")
 
 text_input = st.text_area("Enter text to translate:", height=100)
 
